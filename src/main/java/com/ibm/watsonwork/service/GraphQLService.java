@@ -11,8 +11,6 @@ import com.ibm.watsonwork.schema.WatsonWorkSchema.TargetedMessageMutation;
 
 public interface GraphQLService extends Service {
 
-    TargetedMessageMutation sendTargetedMessage(String conversationId, CreateTargetedMessageInput targetedMessage);
-
     CompletableFuture<TargetedMessageMutation> sendTargetedMessage(WebhookEvent event);
 
     Message getMessage(String messageId);

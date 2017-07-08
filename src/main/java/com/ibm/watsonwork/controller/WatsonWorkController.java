@@ -105,11 +105,11 @@ public class WatsonWorkController {
             log.info("building verification response...");
             return buildVerificationResponse(webhookEvent);
         }
-        processWebhook(outboundToken, webhookEvent);
+        processWebhook(webhookEvent);
         return ResponseEntity.ok().build();
     }
 
-    public void processWebhook(String outboundToken, WebhookEvent webhookEvent) {
+    private void processWebhook(WebhookEvent webhookEvent) {
         log.info("processing webhook event...");
         if (StringUtils.equals(watsonWorkProperties.getAppId(), webhookEvent.getUserId())) {
             log.info("ignoring self messages...");

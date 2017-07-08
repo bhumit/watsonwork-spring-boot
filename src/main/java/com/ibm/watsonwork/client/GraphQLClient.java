@@ -12,15 +12,8 @@ import retrofit2.http.POST;
 public interface GraphQLClient {
 
     String CONTENT_TYPE_APPLICATION_JSON = "Content-Type: application/json";
-    String GRAPHQL_ACTIONS_VIEW = "x-graphql-view: ACTIONS,PUBLIC";
-    String GRAPHQL_PUBLIC_VIEW = "x-graphql-view: PUBLIC";
     String GRAPHQL_BETA_VIEW = "x-graphql-view: PUBLIC,BETA";
     String GRAPHQL_PATH = "/graphql";
-
-    @Headers({CONTENT_TYPE_APPLICATION_JSON, GRAPHQL_BETA_VIEW})
-    @POST(GRAPHQL_PATH)
-    Call<String> createMessage(@Header("Authorization") String authToken, @Body GraphQLQuery query);
-
 
     @Headers({CONTENT_TYPE_APPLICATION_JSON, GRAPHQL_BETA_VIEW})
     @POST(GRAPHQL_PATH)

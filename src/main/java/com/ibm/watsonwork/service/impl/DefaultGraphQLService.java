@@ -1,5 +1,6 @@
 package com.ibm.watsonwork.service.impl;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.ibm.watsonwork.model.Entity;
 import com.ibm.watsonwork.model.ExtractedInfoResponse;
 import com.ibm.watsonwork.model.GraphQLQuery;
 import com.ibm.watsonwork.model.WebhookEvent;
+import com.ibm.watsonwork.schema.WatsonWorkSchema;
 import com.ibm.watsonwork.schema.WatsonWorkSchema.Message;
 import com.ibm.watsonwork.schema.WatsonWorkSchema.QueryResponse;
 import com.ibm.watsonwork.service.AuthService;
@@ -81,41 +83,13 @@ public class DefaultGraphQLService implements GraphQLService {
     private WatsonWorkService watsonWorkService;
 
     @Override
-    public TargetedMessageMutation sendTargetedMessage(String conversationId, CreateTargetedMessageInput targetedMessage) {
-        return null;
-    }
-
-    @Override
-    @SneakyThrows
+    @SneakyThrows(IOException.class)
     @Async
     public CompletableFuture<TargetedMessageMutation> sendTargetedMessage(WebhookEvent event) {
         AnnotationPayload annotationPayload = MessageUtils.mapAnnotationPayload(event.getAnnotationPayload());
 
         if (!annotationPayload.getActionId().equals("news")) {
-            log.info("processing actionSelected event...");
-            Annotation annotation = objectMapper.readValue(annotationPayload.getActionId(), Annotation.class);
-            Actor actor = new Actor();
-            actor.setAvatar("https://api.watsonwork.ibm.com/photos/" + event.getUserId());
-            actor.setName(Humanize.titleize(event.getUserName()) + " shared article:");
-            actor.setUrl("https://api.watsonwork.ibm.com/photos/" + event.getUserId());
-            annotation.setActor(actor);
-
-
-            watsonWorkService.createMessage(event.getSpaceId(), MessageUtils.buildMessage(annotation));
-
-            AnnotationWrapperInput annotationWrapperInput = new AnnotationWrapperInput(new GenericAnnotationInput("News article shared with this space."));
-            CreateTargetedMessageInput targetedMessageInput = new CreateTargetedMessageInput(event.getSpaceId(),
-                    annotationPayload.getTargetDialogId(), event.getUserId(),
-                    Collections.singletonList(annotationWrapperInput))
-                    .setAttachments(Collections.emptyList());
-
-            String mutationToExecute = mutation(query -> query.createTargetedMessage(targetedMessageInput, TargetedMessageMutationQuery::successful)).toString();
-
-            GraphQLQuery graphQLQuery = new GraphQLQuery();
-            graphQLQuery.setQuery(mutationToExecute);
-
-            graphQLClient.createTargetedMessage(authService.getAppAuthToken(), graphQLQuery).execute();
-
+            processActionSelected(event, annotationPayload);
         }
 
         Message message = getMessage(annotationPayload.getReferralMessageId());
@@ -171,10 +145,36 @@ public class DefaultGraphQLService implements GraphQLService {
         return CompletableFuture.completedFuture(execution.body().getData().getCreateTargetedMessage());
     }
 
+    private void processActionSelected(WebhookEvent event, AnnotationPayload annotationPayload) throws IOException {
+        log.info("processing actionSelected event...");
+        Annotation annotation = objectMapper.readValue(annotationPayload.getActionId(), Annotation.class);
+        Actor actor = new Actor();
+        actor.setAvatar("https://api.watsonwork.ibm.com/photos/" + event.getUserId());
+        actor.setName(Humanize.titleize(event.getUserName()) + " shared article:");
+        actor.setUrl("https://api.watsonwork.ibm.com/photos/" + event.getUserId());
+        annotation.setActor(actor);
+
+
+        watsonWorkService.createMessage(event.getSpaceId(), MessageUtils.buildMessage(annotation));
+
+        AnnotationWrapperInput annotationWrapperInput = new AnnotationWrapperInput(new GenericAnnotationInput("News article shared with this space."));
+        CreateTargetedMessageInput targetedMessageInput = new CreateTargetedMessageInput(event.getSpaceId(),
+                annotationPayload.getTargetDialogId(), event.getUserId(),
+                Collections.singletonList(annotationWrapperInput))
+                .setAttachments(Collections.emptyList());
+
+        String mutationToExecute = mutation(query -> query.createTargetedMessage(targetedMessageInput, TargetedMessageMutationQuery::successful)).toString();
+
+        GraphQLQuery graphQLQuery = new GraphQLQuery();
+        graphQLQuery.setQuery(mutationToExecute);
+
+        graphQLClient.createTargetedMessage(authService.getAppAuthToken(), graphQLQuery).execute();
+    }
+
     @Override
-    @SneakyThrows
+    @SneakyThrows(IOException.class)
     public Message getMessage(String messageId) {
-        String queryToSend = query(_queryBuilder -> _queryBuilder
+        String queryToSend = query(rootQuery -> rootQuery
                 .message(new ID(messageId), query -> {
                     query
                             .content()
@@ -198,7 +198,7 @@ public class DefaultGraphQLService implements GraphQLService {
     }
 
     @Override
-    @SneakyThrows
+    @SneakyThrows(IOException.class)
     public MessageMutation addMessageFocus(String messageId) {
 
         MessageFocusInput messageFocus = new MessageFocusInput("news", "news")
