@@ -133,7 +133,6 @@ public class DefaultGraphQLService implements GraphQLService {
                 Collections.singletonList(annotationWrapperInput))
                 .setAttachments(attachments);
 
-
         String mutationToExecute = mutation(query -> query.createTargetedMessage(targetedMessageInput, TargetedMessageMutationQuery::successful)).toString();
 
         GraphQLQuery graphQLQuery = new GraphQLQuery();
