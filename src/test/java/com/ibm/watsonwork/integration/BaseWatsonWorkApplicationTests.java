@@ -7,11 +7,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ibm.watsonwork.ApplicationBootstrap;
 import com.ibm.watsonwork.WatsonWorkConstants;
 import com.ibm.watsonwork.WatsonWorkProperties;
-import com.ibm.watsonwork.model.FileShareResponse;
-import com.ibm.watsonwork.model.OauthResponse;
 import com.ibm.watsonwork.client.AuthClient;
 import com.ibm.watsonwork.client.WatsonWorkClient;
+import com.ibm.watsonwork.model.FileShareResponse;
 import com.ibm.watsonwork.model.Message;
+import com.ibm.watsonwork.model.OauthResponse;
 import com.ibm.watsonwork.model.TokenResponse;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -117,12 +117,12 @@ public class BaseWatsonWorkApplicationTests {
 
     public TestRestTemplate getTestRestTemplate() {
         restTemplate.getRestTemplate().setInterceptors(
-                    Collections.singletonList((request, body, execution) -> {
-                        String hmacSha256Hex = prepareSHA256Hash(watsonWorkProperties.getWebhookSecret(), body);
-                        request.getHeaders()
-                                .add(WatsonWorkConstants.X_OUTBOUND_TOKEN, hmacSha256Hex);
-                        return execution.execute(request, body);
-                    }));
+                Collections.singletonList((request, body, execution) -> {
+                    String hmacSha256Hex = prepareSHA256Hash(watsonWorkProperties.getWebhookSecret(), body);
+                    request.getHeaders()
+                            .add(WatsonWorkConstants.X_OUTBOUND_TOKEN, hmacSha256Hex);
+                    return execution.execute(request, body);
+                }));
         return restTemplate;
     }
 

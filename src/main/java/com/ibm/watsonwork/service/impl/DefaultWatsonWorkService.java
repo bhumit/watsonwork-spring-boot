@@ -89,7 +89,7 @@ public class DefaultWatsonWorkService implements WatsonWorkService {
         uploadAppPhoto.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                if(response.code() == HttpStatus.UNSUPPORTED_MEDIA_TYPE.value()) {
+                if (response.code() == HttpStatus.UNSUPPORTED_MEDIA_TYPE.value()) {
                     LOGGER.error("Failed to upload app photo. Supported Media Type is .jpg or .jpeg");
                 }
                 LOGGER.info("App photo successfully uploaded");

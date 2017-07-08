@@ -8,11 +8,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.ibm.watsonwork.WatsonWorkConstants;
 import com.ibm.watsonwork.WatsonWorkProperties;
+import com.ibm.watsonwork.client.AuthClient;
 import com.ibm.watsonwork.model.OauthResponse;
 import com.ibm.watsonwork.model.TokenResponse;
 import com.ibm.watsonwork.model.WebhookEvent;
 import com.ibm.watsonwork.service.AuthService;
-import com.ibm.watsonwork.client.AuthClient;
 import lombok.SneakyThrows;
 import org.apache.commons.codec.digest.HmacUtils;
 import org.slf4j.Logger;

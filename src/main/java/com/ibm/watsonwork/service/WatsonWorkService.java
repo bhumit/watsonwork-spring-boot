@@ -4,7 +4,7 @@ import java.io.File;
 
 import com.ibm.watsonwork.model.Message;
 
-public interface WatsonWorkService extends Service{
+public interface WatsonWorkService extends Service {
 
     void createMessage(String spaceId, Message message);
 

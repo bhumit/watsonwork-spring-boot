@@ -17,10 +17,21 @@ server:
 
 watsonwork:
         webhook:
-            secret: ${WEBHOOK_SECRET:of7bs9evq4lnbi9slg0qq2k7z6nsfk7y}
+            secret: ${WEBHOOK_SECRET:6oyx35etuf2egdo94sr8o0gx7qz2ilwu}    # hdgmsxlslghatyohqfb79fwclcg8hube
         app:
-            id: ${APP_ID:c79e3474-e963-4024-aa47-4a1087903381}
-            secret: ${APP_SECRET:javltqgjfvjh2d99zj5bjdfr0q4x5lw3}
+            id: ${APP_ID:86414e92-1b99-4ab9-9b17-4e521f4795c8}
+            secret: ${APP_SECRET:m7bu3rvvijm5gz0pu92twrp9ch74yc6f}
+#watsonwork:
+#        webhook:
+#            secret: ${WEBHOOK_SECRET:fsl3njumhl1093aw819dlzxu1zt755o0}
+#        app:
+#            id: ${APP_ID:64920c49-ff81-40b8-b95a-20b376b9e25d}
+#            secret: ${APP_SECRET:21dok66zz5nd90kvt5vva20ovh6tqpwb}
         api:
             uri: ${WATSON_WORK_API_URI:https://api.watsonwork.ibm.com}
             oauth: ${WATSON_WORK_OAUTH:/oauth/authorize}
+
+news:
+    api:
+        uri: ${NEWS_API_URI:https://newsapi.org}
+        secret: ${NEWS_API_SECRET:cd49fd1e657f47e783f809cfdf6ce311}
