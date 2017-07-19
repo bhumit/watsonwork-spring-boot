@@ -13,6 +13,8 @@ public interface GraphQLService extends Service {
 
     CompletableFuture<TargetedMessageMutation> sendTargetedMessage(WebhookEvent event);
 
+    CompletableFuture<TargetedMessageMutation> respondToActionTrigger(WebhookEvent event);
+
     Message getMessage(String messageId);
 
     MessageMutation addMessageFocus(String messageId);

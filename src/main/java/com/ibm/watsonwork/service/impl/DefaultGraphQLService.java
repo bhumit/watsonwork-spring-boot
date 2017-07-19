@@ -9,6 +9,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ibm.watson.developer_cloud.conversation.v1.ConversationService;
+import com.ibm.watson.developer_cloud.conversation.v1.model.MessageRequest;
+import com.ibm.watson.developer_cloud.conversation.v1.model.MessageResponse;
 import com.ibm.watsonwork.MessageTypes;
 import com.ibm.watsonwork.client.GraphQLClient;
 import com.ibm.watsonwork.model.Actor;
@@ -19,7 +22,6 @@ import com.ibm.watsonwork.model.Entity;
 import com.ibm.watsonwork.model.ExtractedInfoResponse;
 import com.ibm.watsonwork.model.GraphQLQuery;
 import com.ibm.watsonwork.model.WebhookEvent;
-import com.ibm.watsonwork.schema.WatsonWorkSchema;
 import com.ibm.watsonwork.schema.WatsonWorkSchema.Message;
 import com.ibm.watsonwork.schema.WatsonWorkSchema.QueryResponse;
 import com.ibm.watsonwork.service.AuthService;
@@ -82,14 +84,23 @@ public class DefaultGraphQLService implements GraphQLService {
     @Autowired
     private WatsonWorkService watsonWorkService;
 
+    private static ConversationService service = new ConversationService("2017-05-26");
+
+    private static String WC_WORKSPACE_ID = "2af4351f-4186-4772-ad2f-2980a1e72901";
+
+
     @Override
     @SneakyThrows(IOException.class)
     @Async
     public CompletableFuture<TargetedMessageMutation> sendTargetedMessage(WebhookEvent event) {
         AnnotationPayload annotationPayload = MessageUtils.mapAnnotationPayload(event.getAnnotationPayload());
 
+        if(annotationPayload.getActionId().startsWith("news_")) {
+            return respondToActionTrigger(event);
+        }
+
         if (!annotationPayload.getActionId().equals("news")) {
-            processActionSelected(event, annotationPayload);
+            return CompletableFuture.completedFuture(processActionSelected(event, annotationPayload));
         }
 
         Message message = getMessage(annotationPayload.getReferralMessageId());
@@ -121,11 +132,56 @@ public class DefaultGraphQLService implements GraphQLService {
                 .findFirst().orElse("top");
 
 
+        Response<MutationResponse> execution = getMutationResponseResponse(event, annotationPayload, source, sortBy);
+
+        return CompletableFuture.completedFuture(execution.body().getData().getCreateTargetedMessage());
+    }
+
+    @Override
+    @SneakyThrows(IOException.class)
+    public CompletableFuture<TargetedMessageMutation> respondToActionTrigger(WebhookEvent event) {
+        AnnotationPayload annotationPayload = MessageUtils.mapAnnotationPayload(event.getAnnotationPayload());
+
+        service.setUsernameAndPassword("80ccbee5-c315-4d61-b16d-b3f6eb2762d6", "kjYv1lLjFzdU");
+        MessageRequest newMessage = new MessageRequest.Builder()
+                .inputText(annotationPayload.getActionId().replace("news_", "").replaceAll("_", " "))
+                .build();
+
+        MessageResponse response = service
+                .message(WC_WORKSPACE_ID, newMessage)
+                .execute();
+
+        Optional<com.ibm.watson.developer_cloud.conversation.v1.model.Entity> sourceEntity = CollectionUtils.emptyIfNull(response.getEntities())
+                .stream()
+                .filter(i -> i.getEntity().equalsIgnoreCase("source"))
+                .findFirst();
+
+        Optional<com.ibm.watson.developer_cloud.conversation.v1.model.Entity> sortByEntity = CollectionUtils.emptyIfNull(response.getEntities())
+                .stream()
+                .filter(i -> i.getEntity().equalsIgnoreCase("sortBy"))
+                .findFirst();
+
+        String source = "bbc-news";
+        String sortBy = "top";
+
+        if(sourceEntity.isPresent()) {
+            source = sourceEntity.get().getValue();
+        }
+
+        if(sortByEntity.isPresent()) {
+            sortBy = sortByEntity.get().getValue();
+        }
+
+        Response<MutationResponse> execution = getMutationResponseResponse(event, annotationPayload, source, sortBy);
+        return CompletableFuture.completedFuture(execution.body().getData().getCreateTargetedMessage());
+
+    }
+
+    private Response<MutationResponse> getMutationResponseResponse(WebhookEvent event, AnnotationPayload annotationPayload, String source, String sortBy) throws IOException {
         List<AttachmentInput> attachments = CollectionUtils.emptyIfNull(newsService.getLatestNews(source, sortBy).getArticles())
                 .stream()
                 .map(this::buildAttachment)
                 .collect(Collectors.toList());
-
 
         AnnotationWrapperInput annotationWrapperInput = new AnnotationWrapperInput(new GenericAnnotationInput("failed to fetch news article..."));
         CreateTargetedMessageInput targetedMessageInput = new CreateTargetedMessageInput(event.getSpaceId(),
@@ -138,13 +194,10 @@ public class DefaultGraphQLService implements GraphQLService {
         GraphQLQuery graphQLQuery = new GraphQLQuery();
         graphQLQuery.setQuery(mutationToExecute);
 
-        Response<MutationResponse> execution = graphQLClient.createTargetedMessage(authService.getAppAuthToken(), graphQLQuery).execute();
-
-
-        return CompletableFuture.completedFuture(execution.body().getData().getCreateTargetedMessage());
+        return graphQLClient.createTargetedMessage(authService.getAppAuthToken(), graphQLQuery).execute();
     }
 
-    private void processActionSelected(WebhookEvent event, AnnotationPayload annotationPayload) throws IOException {
+    private TargetedMessageMutation processActionSelected(WebhookEvent event, AnnotationPayload annotationPayload) throws IOException {
         log.info("processing actionSelected event...");
         Annotation annotation = objectMapper.readValue(annotationPayload.getActionId(), Annotation.class);
         Actor actor = new Actor();
@@ -167,7 +220,8 @@ public class DefaultGraphQLService implements GraphQLService {
         GraphQLQuery graphQLQuery = new GraphQLQuery();
         graphQLQuery.setQuery(mutationToExecute);
 
-        graphQLClient.createTargetedMessage(authService.getAppAuthToken(), graphQLQuery).execute();
+        Response<MutationResponse> execution = graphQLClient.createTargetedMessage(authService.getAppAuthToken(), graphQLQuery).execute();
+        return execution.body().getData().getCreateTargetedMessage();
     }
 
     @Override

@@ -44,6 +44,7 @@ dependencies {
     compile group: 'org.ocpsoft.prettytime', name: 'prettytime', version: '4.0.1.Final'
 	compile 'com.github.mfornos:humanize-slim:1.2.2'
 	compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
+	compile 'com.ibm.watson.developer_cloud:java-sdk:3.3.1'
 
     testCompile group: 'com.squareup.retrofit2', name: 'retrofit-mock', version: "${LIB_RETROFIT2_VERSION}"
     testCompileOnly('org.projectlombok:lombok')
