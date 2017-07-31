@@ -67,6 +67,13 @@ import static com.ibm.watsonwork.schema.WatsonWorkSchema.query;
 @EnableAsync
 public class DefaultGraphQLService implements GraphQLService {
 
+    private static final String NEWS_ = "news_";
+    private static final String NEWS_TRIGGER = "/news";
+    public static final String ACTION_ID_NEWS = "news";
+    public static final String CONVERSATION = "Conversation";
+    public static final String SOURCE = "source";
+    public static final String BBC_NEWS = "bbc-news";
+    public static final String SORT_BY = "sortBy";
     private static PrettyTime prettyTime = new PrettyTime();
 
     @Autowired
@@ -95,11 +102,11 @@ public class DefaultGraphQLService implements GraphQLService {
     public CompletableFuture<TargetedMessageMutation> sendTargetedMessage(WebhookEvent event) {
         AnnotationPayload annotationPayload = MessageUtils.mapAnnotationPayload(event.getAnnotationPayload());
 
-        if(annotationPayload.getActionId().startsWith("news_")) {
+        if(annotationPayload.getActionId().startsWith(NEWS_) || annotationPayload.getActionId().startsWith(NEWS_TRIGGER)) {
             return respondToActionTrigger(event);
         }
 
-        if (!annotationPayload.getActionId().equals("news")) {
+        if (!annotationPayload.getActionId().equals(ACTION_ID_NEWS)) {
             return CompletableFuture.completedFuture(processActionSelected(event, annotationPayload));
         }
 
@@ -120,14 +127,14 @@ public class DefaultGraphQLService implements GraphQLService {
         ExtractedInfoResponse extractedInfo = messageFocus.getExtractedInfo();
 
         String source = CollectionUtils.emptyIfNull(extractedInfo.getEntities()).stream()
-                .filter(e -> e.getSource().equals("Conversation"))
-                .filter(e -> e.getType().equals("source"))
+                .filter(e -> e.getSource().equals(CONVERSATION))
+                .filter(e -> e.getType().equals(SOURCE))
                 .map(Entity::getText)
-                .findFirst().orElse("bbc-news");
+                .findFirst().orElse(BBC_NEWS);
 
         String sortBy = CollectionUtils.emptyIfNull(extractedInfo.getEntities()).stream()
-                .filter(e -> e.getSource().equals("Conversation"))
-                .filter(e -> e.getType().equals("sortBy"))
+                .filter(e -> e.getSource().equals(CONVERSATION))
+                .filter(e -> e.getType().equals(SORT_BY))
                 .map(Entity::getText)
                 .findFirst().orElse("top");
 
@@ -144,7 +151,10 @@ public class DefaultGraphQLService implements GraphQLService {
 
         service.setUsernameAndPassword("80ccbee5-c315-4d61-b16d-b3f6eb2762d6", "kjYv1lLjFzdU");
         MessageRequest newMessage = new MessageRequest.Builder()
-                .inputText(annotationPayload.getActionId().replace("news_", "").replaceAll("_", " "))
+                .inputText(annotationPayload.getActionId()
+                        .replace(NEWS_, "")
+                        .replace(NEWS_TRIGGER, "")
+                        .replaceAll("_", " "))
                 .build();
 
         MessageResponse response = service
@@ -153,12 +163,12 @@ public class DefaultGraphQLService implements GraphQLService {
 
         Optional<com.ibm.watson.developer_cloud.conversation.v1.model.Entity> sourceEntity = CollectionUtils.emptyIfNull(response.getEntities())
                 .stream()
-                .filter(i -> i.getEntity().equalsIgnoreCase("source"))
+                .filter(i -> i.getEntity().equalsIgnoreCase(SOURCE))
                 .findFirst();
 
         Optional<com.ibm.watson.developer_cloud.conversation.v1.model.Entity> sortByEntity = CollectionUtils.emptyIfNull(response.getEntities())
                 .stream()
-                .filter(i -> i.getEntity().equalsIgnoreCase("sortBy"))
+                .filter(i -> i.getEntity().equalsIgnoreCase(SORT_BY))
                 .findFirst();
 
         String source = "bbc-news";
