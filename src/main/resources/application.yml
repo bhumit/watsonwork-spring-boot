@@ -1,0 +1,36 @@
+info:
+    app:
+       name: {build.app.name}
+       group: {build.app.group}
+       description: {build.app.description}
+       version: {build.app.version}
+       buildtime: {build.app.buildtime}
+
+spring:
+        application:
+             name: {build.app.name}
+
+server:
+        port: ${HTTP_PORT:9080}
+        tomcat:
+             uri-encoding: ${URI_ENCODING:UTF-8}
+
+watsonwork:
+        webhook:
+            secret: ${WEBHOOK_SECRET:webhook_secret}
+        app:
+            id: ${APP_ID:app_id}
+            secret: ${APP_SECRET:app_secret}
+        api:
+            uri: ${WATSON_WORK_API_URI:https://api.watsonwork.ibm.com}
+            oauth: ${WATSON_WORK_OAUTH:/oauth/authorize}
+
+zendesk:
+    api:
+        url: ${ZENDESK_API_URL:zendesk_instance_url}
+        username: ${ZENDESK_API_USERNAME:zendesk_api_username}
+        token: ${ZENDESK_API_TOKEN:zendes_api_token}
+
+workspace:
+    integration:
+        spaceId: ${INTEGRATION_SPACE_ID:space_id_for_integration}
