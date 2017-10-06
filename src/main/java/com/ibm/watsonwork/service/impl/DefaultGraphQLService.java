@@ -1,6 +1,7 @@
 package com.ibm.watsonwork.service.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,7 @@ import com.ibm.watson.developer_cloud.conversation.v1.ConversationService;
 import com.ibm.watson.developer_cloud.conversation.v1.model.MessageRequest;
 import com.ibm.watson.developer_cloud.conversation.v1.model.MessageResponse;
 import com.ibm.watsonwork.MessageTypes;
+import com.ibm.watsonwork.NewsApiProperties;
 import com.ibm.watsonwork.client.GraphQLClient;
 import com.ibm.watsonwork.model.Actor;
 import com.ibm.watsonwork.model.Annotation;
@@ -22,6 +24,7 @@ import com.ibm.watsonwork.model.Entity;
 import com.ibm.watsonwork.model.ExtractedInfoResponse;
 import com.ibm.watsonwork.model.GraphQLQuery;
 import com.ibm.watsonwork.model.WebhookEvent;
+import com.ibm.watsonwork.schema.WatsonWorkSchema;
 import com.ibm.watsonwork.schema.WatsonWorkSchema.Message;
 import com.ibm.watsonwork.schema.WatsonWorkSchema.QueryResponse;
 import com.ibm.watsonwork.service.AuthService;
@@ -43,6 +46,8 @@ import org.springframework.stereotype.Service;
 import retrofit2.Response;
 
 import static com.ibm.watsonwork.MessageTypes.MESSAGE_FOCUS;
+import static com.ibm.watsonwork.WatsonWorkConstants.HELP_TEXT;
+import static com.ibm.watsonwork.WatsonWorkConstants.SOURCE_TEXT;
 import static com.ibm.watsonwork.schema.WatsonWorkSchema.AddFocusInput;
 import static com.ibm.watsonwork.schema.WatsonWorkSchema.AnnotationWrapperInput;
 import static com.ibm.watsonwork.schema.WatsonWorkSchema.AttachmentInput;
@@ -69,7 +74,6 @@ public class DefaultGraphQLService implements GraphQLService {
 
     private static final String NEWS_ = "news_";
     private static final String NEWS_TRIGGER = "/news";
-    public static final String ACTION_ID_NEWS = "news";
     public static final String CONVERSATION = "Conversation";
     public static final String SOURCE = "source";
     public static final String BBC_NEWS = "bbc-news";
@@ -93,36 +97,34 @@ public class DefaultGraphQLService implements GraphQLService {
 
     private static ConversationService service = new ConversationService("2017-05-26");
 
-    private static String WC_WORKSPACE_ID = "2af4351f-4186-4772-ad2f-2980a1e72901";
+    private static String WC_WORKSPACE_ID = "abb5a27f-ef48-444c-bdd2-a5fae61359fd";
 
 
     @Override
     @SneakyThrows(IOException.class)
     @Async
-    public CompletableFuture<TargetedMessageMutation> sendTargetedMessage(WebhookEvent event) {
+    public CompletableFuture<TargetedMessageMutation> processActionSelectedEvent(WebhookEvent event) {
         AnnotationPayload annotationPayload = MessageUtils.mapAnnotationPayload(event.getAnnotationPayload());
 
-        if(annotationPayload.getActionId().startsWith(NEWS_) || annotationPayload.getActionId().startsWith(NEWS_TRIGGER)) {
-            return respondToActionTrigger(event);
+        if(annotationPayload.getActionId().equalsIgnoreCase(String.format("%s help", NEWS_TRIGGER))) {
+            return processActionSelectedActionTriggerEventHelp(event);
         }
 
-        if (!annotationPayload.getActionId().equals(ACTION_ID_NEWS)) {
-            return CompletableFuture.completedFuture(processActionSelected(event, annotationPayload));
+        if(annotationPayload.getActionId().startsWith(NEWS_TRIGGER)) {
+            return processActionSelectedActionTriggerEvent(event);
         }
 
+        if(annotationPayload.getActionId().startsWith("share-")) {
+            return CompletableFuture.completedFuture(processActionSelectedShareButton(event, annotationPayload));
+        }
+
+        return processActionSelectedNewsAction(event, annotationPayload);
+    }
+
+    private CompletableFuture<TargetedMessageMutation> processActionSelectedNewsAction(WebhookEvent event, AnnotationPayload annotationPayload) throws IOException {
         Message message = getMessage(annotationPayload.getReferralMessageId());
 
-        Optional<AnnotationPayload> first = message.getAnnotations()
-                .stream()
-                .map(MessageUtils::mapAnnotationPayload)
-                .filter(payload -> payload.getType().equals(MESSAGE_FOCUS) && payload.getApplicationId().equals(authService.getAppId()))
-                .findFirst();
-
-
-        AnnotationPayload messageFocus = new AnnotationPayload();
-        if(first.isPresent()) {
-            messageFocus = first.get();
-        }
+        AnnotationPayload messageFocus = getAnnotationPayload(message);
 
         ExtractedInfoResponse extractedInfo = messageFocus.getExtractedInfo();
 
@@ -139,17 +141,32 @@ public class DefaultGraphQLService implements GraphQLService {
                 .findFirst().orElse("top");
 
 
-        Response<MutationResponse> execution = getMutationResponseResponse(event, annotationPayload, source, sortBy);
+        Response<MutationResponse> execution = sendTargetedMessageWithCards(event, annotationPayload, source, sortBy);
 
         return CompletableFuture.completedFuture(execution.body().getData().getCreateTargetedMessage());
     }
 
+    private AnnotationPayload getAnnotationPayload(Message message) {
+        Optional<AnnotationPayload> first = message.getAnnotations()
+                .stream()
+                .map(MessageUtils::mapAnnotationPayload)
+                .filter(payload -> payload.getType().equals(MESSAGE_FOCUS) && payload.getApplicationId().equals(authService.getAppId()))
+                .findFirst();
+
+
+        AnnotationPayload messageFocus = new AnnotationPayload();
+        if(first.isPresent()) {
+            messageFocus = first.get();
+        }
+        return messageFocus;
+    }
+
     @Override
     @SneakyThrows(IOException.class)
-    public CompletableFuture<TargetedMessageMutation> respondToActionTrigger(WebhookEvent event) {
+    public CompletableFuture<TargetedMessageMutation> processActionSelectedActionTriggerEvent(WebhookEvent event) {
         AnnotationPayload annotationPayload = MessageUtils.mapAnnotationPayload(event.getAnnotationPayload());
 
-        service.setUsernameAndPassword("80ccbee5-c315-4d61-b16d-b3f6eb2762d6", "kjYv1lLjFzdU");
+        service.setUsernameAndPassword("7a6154ef-e40c-4b0c-9c44-afab2b827d02", "2IHX1mbh4QiS");
         MessageRequest newMessage = new MessageRequest.Builder()
                 .inputText(annotationPayload.getActionId()
                         .replace(NEWS_, "")
@@ -182,12 +199,34 @@ public class DefaultGraphQLService implements GraphQLService {
             sortBy = sortByEntity.get().getValue();
         }
 
-        Response<MutationResponse> execution = getMutationResponseResponse(event, annotationPayload, source, sortBy);
+        Response<MutationResponse> execution = sendTargetedMessageWithCards(event, annotationPayload, source, sortBy);
         return CompletableFuture.completedFuture(execution.body().getData().getCreateTargetedMessage());
 
     }
 
-    private Response<MutationResponse> getMutationResponseResponse(WebhookEvent event, AnnotationPayload annotationPayload, String source, String sortBy) throws IOException {
+    @SneakyThrows(IOException.class)
+    private CompletableFuture<TargetedMessageMutation> processActionSelectedActionTriggerEventHelp(WebhookEvent event) {
+        AnnotationPayload annotationPayload = MessageUtils.mapAnnotationPayload(event.getAnnotationPayload());
+
+
+
+        AnnotationWrapperInput annotationWrapperInput = new AnnotationWrapperInput(new GenericAnnotationInput(HELP_TEXT)
+        .setButtons(Arrays.asList(new WatsonWorkSchema.ButtonWrapperInput(
+                new WatsonWorkSchema.PostbackButtonInput("share-" + SOURCE_TEXT, "Share sources", ButtonStyle.PRIMARY)))));
+        CreateTargetedMessageInput targetedMessageInput = new CreateTargetedMessageInput(event.getSpaceId(),
+                annotationPayload.getTargetDialogId(), event.getUserId(),
+                Collections.singletonList(annotationWrapperInput));
+
+        String mutationToExecute = mutation(query -> query.createTargetedMessage(targetedMessageInput, TargetedMessageMutationQuery::successful)).toString();
+
+        GraphQLQuery graphQLQuery = new GraphQLQuery();
+        graphQLQuery.setQuery(mutationToExecute);
+
+        Response<MutationResponse> execution = graphQLClient.createTargetedMessage(authService.getAppAuthToken(), graphQLQuery).execute();
+        return CompletableFuture.completedFuture(execution.body().getData().getCreateTargetedMessage());
+    }
+
+    private Response<MutationResponse> sendTargetedMessageWithCards(WebhookEvent event, AnnotationPayload annotationPayload, String source, String sortBy) throws IOException {
         List<AttachmentInput> attachments = CollectionUtils.emptyIfNull(newsService.getLatestNews(source, sortBy).getArticles())
                 .stream()
                 .map(this::buildAttachment)
@@ -207,9 +246,9 @@ public class DefaultGraphQLService implements GraphQLService {
         return graphQLClient.createTargetedMessage(authService.getAppAuthToken(), graphQLQuery).execute();
     }
 
-    private TargetedMessageMutation processActionSelected(WebhookEvent event, AnnotationPayload annotationPayload) throws IOException {
+    private TargetedMessageMutation processActionSelectedShareButton(WebhookEvent event, AnnotationPayload annotationPayload) throws IOException {
         log.info("processing actionSelected event...");
-        Annotation annotation = objectMapper.readValue(annotationPayload.getActionId(), Annotation.class);
+        Annotation annotation = objectMapper.readValue(annotationPayload.getActionId().replaceFirst("share-",""), Annotation.class);
         Actor actor = new Actor();
         actor.setAvatar("https://api.watsonwork.ibm.com/photos/" + event.getUserId());
         actor.setName(Humanize.titleize(event.getUserName()) + " shared article:");
@@ -309,7 +348,7 @@ public class DefaultGraphQLService implements GraphQLService {
 
         String payload = objectMapper.writeValueAsString(annotation);
 
-        ButtonInput shareUrlButton = new ButtonInput("Share With Space", payload, ButtonStyle.PRIMARY);
+        ButtonInput shareUrlButton = new ButtonInput("Share With Space", "share-" + payload, ButtonStyle.PRIMARY);
 
         InformationCardInput informationCardInput = new InformationCardInput(title, author, description, publishedAt,
                 Collections.singletonList(shareUrlButton));

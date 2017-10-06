@@ -114,7 +114,7 @@ public class WatsonWorkController {
         }
 
         if (MESSAGE_ANNOTATION_ADDED.equalsIgnoreCase(webhookEvent.getType()) && ACTION_SELECTED.equalsIgnoreCase(webhookEvent.getAnnotationType())) {
-            graphQLService.sendTargetedMessage(webhookEvent);
+            graphQLService.processActionSelectedEvent(webhookEvent);
 
         }
     }

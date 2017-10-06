@@ -11,9 +11,9 @@ import com.ibm.watsonwork.schema.WatsonWorkSchema.TargetedMessageMutation;
 
 public interface GraphQLService extends Service {
 
-    CompletableFuture<TargetedMessageMutation> sendTargetedMessage(WebhookEvent event);
+    CompletableFuture<TargetedMessageMutation> processActionSelectedEvent(WebhookEvent event);
 
-    CompletableFuture<TargetedMessageMutation> respondToActionTrigger(WebhookEvent event);
+    CompletableFuture<TargetedMessageMutation> processActionSelectedActionTriggerEvent(WebhookEvent event);
 
     Message getMessage(String messageId);
 

@@ -15,21 +15,40 @@ server:
         tomcat:
              uri-encoding: ${URI_ENCODING:UTF-8}
 
-watsonwork:
-        webhook:
-            secret: ${WEBHOOK_SECRET:6oyx35etuf2egdo94sr8o0gx7qz2ilwu}    # hdgmsxlslghatyohqfb79fwclcg8hube
-        app:
-            id: ${APP_ID:86414e92-1b99-4ab9-9b17-4e521f4795c8}
-            secret: ${APP_SECRET:m7bu3rvvijm5gz0pu92twrp9ch74yc6f}
 #watsonwork:
 #        webhook:
-#            secret: ${WEBHOOK_SECRET:fsl3njumhl1093aw819dlzxu1zt755o0}
+#            secret: ${WEBHOOK_SECRET:6oyx35etuf2egdo94sr8o0gx7qz2ilwu}    # hdgmsxlslghatyohqfb79fwclcg8hube
+#        app:
+#            id: ${APP_ID:86414e92-1b99-4ab9-9b17-4e521f4795c8}
+#            secret: ${APP_SECRET:m7bu3rvvijm5gz0pu92twrp9ch74yc6f}
+#watsonwork:
+#        webhook:
+#            secret: ${WEBHOOK_SECRET:27euo4x3zvqun04vargcpb3z2naqhv79}
 #        app:
 #            id: ${APP_ID:64920c49-ff81-40b8-b95a-20b376b9e25d}
 #            secret: ${APP_SECRET:21dok66zz5nd90kvt5vva20ovh6tqpwb}
+#        api:
+#            uri: ${WATSON_WORK_API_URI:https://api.watsonwork.ibm.com}
+#            oauth: ${WATSON_WORK_OAUTH:/oauth/authorize}
+
+watsonwork:
+        webhook:
+            secret: ${WEBHOOK_SECRET:vsguttr4aas6q9l43go4ozistxttqqh}
+        app:
+            id: ${APP_ID:3c845f47-c56a-4ca9-a1cb-12dbebd72c3b}
+            secret: ${APP_SECRET:JiD9NxWwD6B5lUNXu3FIBi3XMt4Z}
         api:
             uri: ${WATSON_WORK_API_URI:https://api.watsonwork.ibm.com}
             oauth: ${WATSON_WORK_OAUTH:/oauth/authorize}
+#watsonwork:
+#        webhook:
+#            secret: ${WEBHOOK_SECRET:8cac2pkn7h7043179wmh2acfsheafntj}
+#        app:
+#            id: ${APP_ID:0240d20d-39f3-4fa0-bc45-a1ed35ac84bf}
+#            secret: ${APP_SECRET:SHC6NMUUMDr1BloaentfBNWsNN5H}
+#        api:
+#            uri: ${WATSON_WORK_API_URI:https://api.watsonwork.ibm.com}
+#            oauth: ${WATSON_WORK_OAUTH:/oauth/authorize}
 
 news:
     api:

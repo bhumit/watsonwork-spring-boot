@@ -22,5 +22,25 @@ public class WatsonWorkConstants {
 
     public static final String HTTPS_OAUTH_CALLBACK = "https://%s/oauthCallback";
 
+    public static final String HELP_TEXT  = "*Here are some examples to get you started:*\n" +
+            "\n" +
+            "```\n" +
+            "what are the latest news from BBC?\n" +
+            "what is in the newspaper today?\n" +
+            "```\n" +
+            "\n" +
+            "*Usage:* /news latest news from CNN?\n" +
+            "\n";
+
+    public static final String SOURCE_TEXT = "*You can replace `CNN` (news source) with any of the following:*\n" +
+            "\n" +
+            "```\n" +
+            "Financial Times, Ars Technica, The Huffington Post, Reuters, Daily Mail\n" +
+            "CNN, BBC News, The Guardian UK, IGN, ESPN, Independent, The Verge, Engadget\n" +
+            "Bloomberg, TechCrunch, Hacker News, The Wall Street Journal, BBC Sport, ESPN Cric Info,\n" +
+            "Metro, The Economist, Buzzfeed, Football Italia, NFL News, Reddit r/all,\n" +
+            "The New York Times, Al Jazeera English, Associated Press, CNBC, Google News\n" +
+            "```\n";
+
 
 }
