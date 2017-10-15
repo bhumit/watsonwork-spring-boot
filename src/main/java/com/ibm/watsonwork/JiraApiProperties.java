@@ -8,11 +8,14 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @ConfigurationProperties
-public class NewsApiProperties {
+public class JiraApiProperties {
 
-    @Value("${news.api.uri}")
+    @Value("${jira.api.uri}")
     private String apiUrl;
 
-    @Value("${news.api.secret}")
-    private String apiSecret;
+    @Value("${jira.api.username}")
+    private String apiUsername;
+
+    @Value("${jira.api.password}")
+    private String apiPassword;
 }

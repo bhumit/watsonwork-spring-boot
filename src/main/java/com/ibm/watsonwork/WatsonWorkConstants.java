@@ -22,15 +22,30 @@ public class WatsonWorkConstants {
 
     public static final String HTTPS_OAUTH_CALLBACK = "https://%s/oauthCallback";
 
-    public static final String HELP_TEXT  = "*Here are some examples to get you started:*\n" +
+    public static final String HELP_TEXT  = "JIRA Integration for Watson Work supports the following:\n" +
             "\n" +
-            "```\n" +
-            "what are the latest news from BBC?\n" +
-            "what is in the newspaper today?\n" +
-            "```\n" +
+            "JIRA App for Watson Workspace allows you to look for issues by priority and assign it to JIRA users.\n" +
+            "The app will reflect those changes to your JIRA system. (https://watsonworkspace.atlassian.net/) \n" +
             "\n" +
-            "*Usage:* /news latest news from CNN?\n" +
-            "\n";
+            "*Fetch issues by the following status:*\n" +
+            "- Highest\n" +
+            "- High\n" +
+            "- Medium\n" +
+            "- Low\n" +
+            "- Lowest\n" +
+            "\n" +
+            "*Issues status:*\n" +
+            "- Assigned\n" +
+            "- Unassigned\n" +
+            "\n" +
+            "*Example intents:*\n" +
+            "- show me all issues with low priority \n" +
+            "  (Replace *low*  with any of the status above)\n" +
+            "\n" +
+            "- what issues are currently unassigned with highest priority?  \n" +
+            "  (Replace *highest*  with any of the status above, Replace *unassigned* with Assigned)" +
+            "\n" +
+            "*Same info is accessible via /jira ...*";
 
     public static final String SOURCE_TEXT = "*You can replace `CNN` (news source) with any of the following:*\n" +
             "\n" +

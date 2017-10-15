@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.ibm.watsonwork.client.AuthClient;
 import com.ibm.watsonwork.client.GraphQLClient;
-import com.ibm.watsonwork.client.NewsClient;
+import com.ibm.watsonwork.client.JiraClient;
 import com.ibm.watsonwork.client.WatsonWorkClient;
 import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ public class WatsonWorkConfiguration {
     private WatsonWorkProperties watsonWorkProperties;
 
     @Autowired
-    private NewsApiProperties newsApiProperties;
+    private JiraApiProperties jiraApiProperties;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -50,12 +50,12 @@ public class WatsonWorkConfiguration {
                 .build();
     }
 
-    @Bean(name = "newsApi")
-    public Retrofit retrofitNewsApi(OkHttpClient client) {
+    @Bean(name = "jiraApi")
+    public Retrofit retrofitJiraClient(OkHttpClient client) {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return new Retrofit.Builder()
                 .addConverterFactory(JacksonConverterFactory.create(objectMapper))
-                .baseUrl(newsApiProperties.getApiUrl())
+                .baseUrl(jiraApiProperties.getApiUrl())
                 .client(client)
                 .build();
     }
@@ -71,8 +71,8 @@ public class WatsonWorkConfiguration {
     }
 
     @Bean
-    public NewsClient newsClient(@Qualifier(value = "newsApi") Retrofit retrofit) {
-        return retrofit.create(NewsClient.class);
+    public JiraClient newsClient(@Qualifier(value = "jiraApi") Retrofit retrofit) {
+        return retrofit.create(JiraClient.class);
     }
 
     @Bean

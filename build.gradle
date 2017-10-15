@@ -22,6 +22,9 @@ sourceCompatibility = 1.8
 repositories {
     jcenter()
 	mavenCentral()
+	maven {
+		url "https://maven.atlassian.com/public"
+	}
 }
 
 
@@ -48,6 +51,12 @@ dependencies {
 
     testCompile group: 'com.squareup.retrofit2', name: 'retrofit-mock', version: "${LIB_RETROFIT2_VERSION}"
     testCompileOnly('org.projectlombok:lombok')
+
+
+	compile group: 'com.atlassian.jira', name: 'jira-rest-java-client-api', version: '4.0.0'
+	compile group: 'com.atlassian.jira', name: 'jira-rest-java-client-core', version: '4.0.0'
+	compile "com.atlassian.fugue:fugue:2.2.1"
+
 
 
 

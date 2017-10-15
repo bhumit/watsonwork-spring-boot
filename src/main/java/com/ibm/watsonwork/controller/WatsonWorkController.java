@@ -8,11 +8,17 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.ibm.watsonwork.MessageTypes;
 import com.ibm.watsonwork.WatsonWorkProperties;
+import com.ibm.watsonwork.model.Actor;
+import com.ibm.watsonwork.model.Annotation;
 import com.ibm.watsonwork.model.OauthResponse;
 import com.ibm.watsonwork.model.WebhookEvent;
 import com.ibm.watsonwork.service.AuthService;
 import com.ibm.watsonwork.service.GraphQLService;
+import com.ibm.watsonwork.service.WatsonWorkService;
+import com.ibm.watsonwork.utils.MessageUtils;
+import humanize.Humanize;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +64,9 @@ public class WatsonWorkController {
 
     @Autowired
     private GraphQLService graphQLService;
+
+    @Autowired
+    private WatsonWorkService watsonWorkService;
 
     @GetMapping("/")
     public String hello(@CookieValue(value = COOKIE_ID_VALUE, required = false) String idCookie, Map<String, Object> model, HttpServletRequest request,
