@@ -28,6 +28,6 @@ watsonwork:
 
 jira:
     api:
-        uri: ${JIRA_API_URI:https://watsonworkspace.atlassian.net}
-        username: ${JIRA_API_USERNAME:bhumitp23+jira@gmail.com}
-        password: ${JIRA_API_PASSWORD:qFf9T5fDyTJBN2YmTjULB664}
+        uri: ${JIRA_API_URI:https://ibmworkspace.atlassian.net}
+        username: ${JIRA_API_USERNAME:apenrose@ie.ibm.com}
+        password: ${JIRA_API_PASSWORD:Shithead100@}
