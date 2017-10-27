@@ -10,6 +10,7 @@ import com.ibm.watsonwork.client.GraphQLClient;
 import com.ibm.watsonwork.client.JiraClient;
 import com.ibm.watsonwork.client.WatsonWorkClient;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -27,12 +28,16 @@ public class WatsonWorkConfiguration {
     @Autowired
     private JiraApiProperties jiraApiProperties;
 
+    HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @Bean
     public OkHttpClient okHttpClient() {
         return new OkHttpClient().newBuilder()
+                .addInterceptor(logging.setLevel(HttpLoggingInterceptor.Level.BODY))
                 .connectTimeout(7, TimeUnit.SECONDS)
                 .readTimeout(8, TimeUnit.SECONDS)
                 .writeTimeout(9, TimeUnit.SECONDS).build();
