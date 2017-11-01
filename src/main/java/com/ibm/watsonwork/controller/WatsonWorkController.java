@@ -2,23 +2,18 @@ package com.ibm.watsonwork.controller;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ibm.watsonwork.MessageTypes;
+import com.ibm.watsonwork.WatsonWorkConfiguration;
 import com.ibm.watsonwork.WatsonWorkProperties;
-import com.ibm.watsonwork.model.Actor;
-import com.ibm.watsonwork.model.Annotation;
 import com.ibm.watsonwork.model.OauthResponse;
 import com.ibm.watsonwork.model.WebhookEvent;
 import com.ibm.watsonwork.service.AuthService;
 import com.ibm.watsonwork.service.GraphQLService;
 import com.ibm.watsonwork.service.WatsonWorkService;
-import com.ibm.watsonwork.utils.MessageUtils;
-import humanize.Humanize;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,8 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static com.ibm.watsonwork.MessageTypes.ACTION_SELECTED;
-import static com.ibm.watsonwork.MessageTypes.MESSAGE_ANNOTATION_ADDED;
 import static com.ibm.watsonwork.MessageTypes.VERIFICATION;
 import static com.ibm.watsonwork.WatsonWorkConstants.CALLBACK_TEMPLATE;
 import static com.ibm.watsonwork.WatsonWorkConstants.CLIENT_ID_KEY;
@@ -67,6 +60,9 @@ public class WatsonWorkController {
 
     @Autowired
     private WatsonWorkService watsonWorkService;
+
+    @Autowired
+    private WatsonWorkConfiguration configuration;
 
     @GetMapping("/")
     public String hello(@CookieValue(value = COOKIE_ID_VALUE, required = false) String idCookie, Map<String, Object> model, HttpServletRequest request,
@@ -104,8 +100,7 @@ public class WatsonWorkController {
     }
 
     @PostMapping(value = "/webhook", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity webhookCallback(@RequestHeader(X_OUTBOUND_TOKEN) String outboundToken, @RequestBody WebhookEvent webhookEvent)
-            throws ExecutionException, InterruptedException {
+    public ResponseEntity webhookCallback(@RequestHeader(X_OUTBOUND_TOKEN) String outboundToken, @RequestBody WebhookEvent webhookEvent) throws IOException {
 
         if (VERIFICATION.equalsIgnoreCase(webhookEvent.getType()) && authService.isValidVerificationRequest(webhookEvent, outboundToken)) {
             log.info("building verification response...");
@@ -115,17 +110,34 @@ public class WatsonWorkController {
         return ResponseEntity.ok().build();
     }
 
-    private void processWebhook(WebhookEvent webhookEvent) {
+    private void processWebhook(WebhookEvent webhookEvent) throws IOException {
         log.info("processing webhook event...");
         if (StringUtils.equals(watsonWorkProperties.getAppId(), webhookEvent.getUserId())) {
             log.info("ignoring self messages...");
             return;
         }
 
-        if (MESSAGE_ANNOTATION_ADDED.equalsIgnoreCase(webhookEvent.getType()) && ACTION_SELECTED.equalsIgnoreCase(webhookEvent.getAnnotationType())) {
-            graphQLService.processActionSelectedEvent(webhookEvent);
+//        if(MESSAGE_CREATED.equalsIgnoreCase(webhookEvent.getType()) && webhookEvent.getContent().equalsIgnoreCase("issues")) {
+//            Github github = configuration.github();
+//
+//            EnumMap<Issues.Qualifier, String> qualifierStringEnumMap = new EnumMap<>(Issues.Qualifier.class);
+//            qualifierStringEnumMap.put(Issues.Qualifier.ASSIGNEE,"bhumitpatel");
+//
+//            Iterable<Issue> issues = github.repos().get(new Coordinates.Simple("toscana", "planning"))
+//                    .issues()
+//                    .search(Issues.Sort.CREATED, Search.Order.ASC, qualifierStringEnumMap);
+//
+//            for (Issue issue : issues) {
+//                Issue.Smart smart = new Issue.Smart(issue);
+//                watsonWorkService.createMessage(webhookEvent.getSpaceId(),
+//                        MessageUtils.buildMessage("#" + smart.number() + " "+ smart.title(), smart.htmlUrl().toExternalForm()));
+//            }
+//        }
 
-        }
+//        if (MESSAGE_ANNOTATION_ADDED.equalsIgnoreCase(webhookEvent.getType()) && ACTION_SELECTED.equalsIgnoreCase(webhookEvent.getAnnotationType())) {
+//            graphQLService.processActionSelectedEvent(webhookEvent);
+//
+//        }
     }
 
     private ResponseEntity buildVerificationResponse(WebhookEvent webhookEvent) {

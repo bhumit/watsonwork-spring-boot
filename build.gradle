@@ -59,6 +59,7 @@ dependencies {
 
 	compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
 
+	compile 'com.jcabi:jcabi-github:0.33.1'
 
 
 

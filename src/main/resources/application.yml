@@ -17,10 +17,10 @@ server:
 
 watsonwork:
         webhook:
-            secret: ${WEBHOOK_SECRET:o1m9c3za2i2pi40b20pyk18alg53bmk6}
+            secret: ${WEBHOOK_SECRET:6d42h9qqex8c80f7viqgajxqshy3j3qx}
         app:
-            id: ${APP_ID:355d4a5f-eed8-443d-a315-cf95e7e63818}
-            secret: ${APP_SECRET:3ROXQathKn00VOlVcfEmPCh8hW7B}
+            id: ${APP_ID:69577618-b697-4de8-b14a-7789633f9df6}
+            secret: ${APP_SECRET:D4UhsN1Awy1_pk_CG3lMLV-sapPg}
         api:
             uri: ${WATSON_WORK_API_URI:https://api.watsonwork.ibm.com}
             oauth: ${WATSON_WORK_OAUTH:/oauth/authorize}
