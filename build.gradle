@@ -30,8 +30,8 @@ repositories {
 
 dependencies {
 	compile("org.springframework.boot:spring-boot-starter-web")
-	compile("org.springframework.boot:spring-boot-starter-thymeleaf")
 	compile group: 'com.squareup.okhttp3', name: 'logging-interceptor', version: "$LIB_OKHTTP_LOGGING_INTERCEPTOR_VERSION"
+	compile("org.springframework.boot:spring-boot-starter-actuator")
 	compileOnly('org.projectlombok:lombok')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "${LIB_JACKSON_VERSION}"
@@ -41,7 +41,7 @@ dependencies {
 	compile group: 'commons-codec', name: 'commons-codec', version: "${LIB_COMMONS_CODEC}"
 	compile group: 'com.squareup.retrofit2', name: 'retrofit', version: "${LIB_RETROFIT2_VERSION}"
 	compile group: 'com.squareup.retrofit2', name: 'converter-jackson', version: "${LIB_RETROFIT2_VERSION}"
-	compile 'com.shopify.graphql.support:support:0.1.0'
+	compile 'com.shopify.graphql.support:support:0.1.1'
     compile group: 'com.google.code.gson', name: 'gson', version: '2.8.1'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     compile group: 'org.ocpsoft.prettytime', name: 'prettytime', version: '4.0.1.Final'
@@ -51,15 +51,6 @@ dependencies {
 
     testCompile group: 'com.squareup.retrofit2', name: 'retrofit-mock', version: "${LIB_RETROFIT2_VERSION}"
     testCompileOnly('org.projectlombok:lombok')
-
-
-	compile group: 'com.atlassian.jira', name: 'jira-rest-java-client-api', version: '4.0.0'
-	compile group: 'com.atlassian.jira', name: 'jira-rest-java-client-core', version: '4.0.0'
-	compile "com.atlassian.fugue:fugue:2.2.1"
-
-	compile 'com.squareup.okhttp3:logging-interceptor:3.8.0'
-
-	compile 'com.jcabi:jcabi-github:0.33.1'
 
 
 

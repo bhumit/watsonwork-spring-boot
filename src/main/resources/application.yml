@@ -14,13 +14,16 @@ server:
         port: ${HTTP_PORT:9080}
         tomcat:
              uri-encoding: ${URI_ENCODING:UTF-8}
+management:
+  security:
+      enabled: false
 
 watsonwork:
         webhook:
-            secret: ${WEBHOOK_SECRET:6d42h9qqex8c80f7viqgajxqshy3j3qx}
+            secret: ${WEBHOOK_SECRET:k2oslj2jrr5g94q1q92ykxc7ev9y4hbj}
         app:
-            id: ${APP_ID:69577618-b697-4de8-b14a-7789633f9df6}
-            secret: ${APP_SECRET:D4UhsN1Awy1_pk_CG3lMLV-sapPg}
+            id: ${APP_ID:2b8db1d2-f660-4eb2-9966-4e6a2b7415d2}
+            secret: ${APP_SECRET:0rINTyc07cDyF8CayILjBt_bLiJN}
         api:
             uri: ${WATSON_WORK_API_URI:https://api.watsonwork.ibm.com}
             oauth: ${WATSON_WORK_OAUTH:/oauth/authorize}

@@ -17,7 +17,7 @@ public interface GraphQLClient {
 
     @Headers({CONTENT_TYPE_APPLICATION_JSON, GRAPHQL_BETA_VIEW})
     @POST(GRAPHQL_PATH)
-    Call<MutationResponse> createTargetedMessage(@Header("Authorization") String authToken, @Body GraphQLQuery query);
+    Call<MutationResponse> executeGraphqlMutation(@Header("Authorization") String authToken, @Body GraphQLQuery query);
 
 
     @Headers({CONTENT_TYPE_APPLICATION_JSON, GRAPHQL_BETA_VIEW})
