@@ -20,17 +20,10 @@ management:
 
 watsonwork:
         webhook:
-            secret: ${WEBHOOK_SECRET:k2oslj2jrr5g94q1q92ykxc7ev9y4hbj}
+            secret: ${WEBHOOK_SECRET:1234}
         app:
-            id: ${APP_ID:2b8db1d2-f660-4eb2-9966-4e6a2b7415d2}
-            secret: ${APP_SECRET:0rINTyc07cDyF8CayILjBt_bLiJN}
+            id: ${APP_ID:1234}
+            secret: ${APP_SECRET:1234}
         api:
             uri: ${WATSON_WORK_API_URI:https://api.watsonwork.ibm.com}
             oauth: ${WATSON_WORK_OAUTH:/oauth/authorize}
-
-
-jira:
-    api:
-        uri: ${JIRA_API_URI:https://ibmworkspace.atlassian.net}
-        username: ${JIRA_API_USERNAME:apenrose@ie.ibm.com}
-        password: ${JIRA_API_PASSWORD:Shithead100@}
